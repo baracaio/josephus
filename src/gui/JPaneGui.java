@@ -231,10 +231,22 @@ public class JPaneGui extends JFrame implements GuiInterface {
                     repaint();
                     sleep(300);
                 }
+                getWinner();
             } catch (Exception exception) {
                 JOptionPane.showMessageDialog(null, "Houve um erro inesperado.");
                 System.exit(2);
             }
         }
     }
+
+    private void getWinner() {
+        NodeInterface node = list.getFirst();
+        int i = 1;
+        while (!node.getValue()) {
+            node = node.getNext();
+            i++;
+        }
+        JOptionPane.showMessageDialog(null, "Winner: " + i);
+    }
+
 }
