@@ -73,24 +73,14 @@ public class LinkedList implements LinkedListInterface {
     public void insert(NodeInterface newNode, int position) {
         if (position > 0 && position <= size) {
             if (position == 1) {
-                if (size == 0) {
-                    // Insere o primeiro
-                    first = newNode;
-                    last = newNode;
-                    newNode.setNext(newNode);
-                    newNode.setPrevious(newNode);
-                } else {
-                    // Insere no inicio
-                    newNode.setNext(first);
-                    first.setPrevious(newNode);
-                    first = newNode;
-                    first.setPrevious(last);
-                    last.setNext(first);
-                    size++;
-                }
+                newNode.setNext(first);
+                first.setPrevious(newNode);
+                first = newNode;
+                first.setPrevious(last);
+                last.setNext(first);
+                size++;
                 size++;
             } else if (position == size) {
-                // Insere no fim
                 last.setNext(newNode);
                 newNode.setPrevious(last);
                 newNode.setNext(first);
