@@ -36,14 +36,17 @@ public class LinkedList implements LinkedListInterface {
         if (size == 0) {
             first = node;
             last = node;
-            first.setNext(last);
-            last.setPrevious(first);
+            node.setNext(node);
+            node.setPrevious(node);
             size++;
             return;
         }
 
         node.setNext(first);
+        first.setPrevious(node);
         first = node;
+        first.setPrevious(last);
+        last.setNext(first);
         size++;
     }
 
@@ -52,69 +55,99 @@ public class LinkedList implements LinkedListInterface {
         if (size == 0) {
             first = node;
             last = node;
-            first.setNext(last);
-            last.setPrevious(first);
+            node.setNext(node);
+            node.setPrevious(node);
             size++;
             return;
         }
 
+        last.setNext(node);
         node.setPrevious(last);
+        node.setNext(first);
         last = node;
+        first.setPrevious(last);
         size++;
     }
 
     @Override
     public void insert(NodeInterface newNode, int position) {
         if (position > 0 && position <= size) {
-            NodeInterface node = first;
-            NodeInterface previous;
+            if (position == 1) {
+                if (size == 0) {
+                    // Insere o primeiro
+                    first = newNode;
+                    last = newNode;
+                    newNode.setNext(newNode);
+                    newNode.setPrevious(newNode);
+                } else {
+                    // Insere no inicio
+                    newNode.setNext(first);
+                    first.setPrevious(newNode);
+                    first = newNode;
+                    first.setPrevious(last);
+                    last.setNext(first);
+                    size++;
+                }
+                size++;
+            } else if (position == size) {
+                // Insere no fim
+                last.setNext(newNode);
+                newNode.setPrevious(last);
+                newNode.setNext(first);
+                last = newNode;
+                first.setPrevious(last);
+                size++;
+            } else {
+                NodeInterface node = first;
+                NodeInterface previous;
 
-            for (int i = 1; i <= position; i++) {
-                node = node.getNext();
+                for (int i = 1; i <= position; i++) {
+                    node = node.getNext();
+                }
+
+                previous = node.getPrevious();
+                previous.setNext(newNode);
+
+                newNode.setPrevious(previous);
+                newNode.setNext(node);
+
+                node.setPrevious(newNode);
+
+                size++;
             }
-
-            previous = node.getPrevious();
-            previous.setNext(newNode);
-
-            newNode.setPrevious(previous);
-            newNode.setNext(node);
-
-            node.setPrevious(newNode);
-
-            size++;
         }
     }
 
     @Override
     public void removeBeginning() {
-        if (size <= 1) {
-            first = null;
-            last = null;
-            size = 0;
-            return;
+        if (size != 0) {
+            if (size == 1) {
+                first = null;
+                last = null;
+                size--;
+                return;
+            }
+            first = first.getNext();
+            first.setPrevious(last);
+            last.setNext(first);
+            size--;
         }
-
-        first = first.getNext();
-        first.setPrevious(last);
-        last.setNext(first);
-
-        size--;
     }
 
     @Override
     public void removeEnd() {
-        if (size <= 1) {
-            first = null;
-            last = null;
-            size = 0;
-            return;
+        if (size != 0) {
+            if (size == 1) {
+                first = null;
+                last = null;
+                size--;
+                return;
+            }
+            last = last.getPrevious();
+            last.setNext(first);
+            first.setPrevious(last);
+            size--;
         }
-
-        last = last.getPrevious();
-        last.setNext(first);
-        first.setPrevious(last);
-
-        size--;
     }
 
     @Override
@@ -122,22 +155,39 @@ public class LinkedList implements LinkedListInterface {
         if (position > size || position < 1) {
             return;
         }
+        if (position == 1) {
+            if (size == 1) {
+                first = null;
+                last = null;
+            } else {
+                first = first.getNext();
+                first.setPrevious(last);
+                last.setNext(first);
+            }
+            size--;
+        } else if (position == size) {
+            last = last.getPrevious();
+            last.setNext(first);
+            first.setPrevious(last);
+            size--;
+        } else {
+            NodeInterface previous;
+            NodeInterface next;
+            NodeInterface node = first;
 
-        NodeInterface previous;
-        NodeInterface next;
-        NodeInterface node = first;
+            for (int i = 1; i <= position; i++) {
+                node = node.getNext();
+            }
 
-        for (int i = 1; i <= position; i++) {
-            node = node.getNext();
+            previous = node.getPrevious();
+            next = node.getNext();
+
+            next.setPrevious(previous);
+            previous.setNext(next);
+
+            node.setNext(null);
+            node.setPrevious(null);
+            size--;
         }
-
-        previous = node.getPrevious();
-        next = node.getNext();
-
-        next.setPrevious(previous);
-        previous.setNext(next);
-
-        node = null;
-        size--;
     }
 }
