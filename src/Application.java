@@ -17,9 +17,8 @@ public class Application {
             if (node.getValue()) {
                 System.out.println(i + " - vivo");
             } else {
-                System.out.println(1 + " - morto");
+                System.out.println(i + " - morto");
             }
-
             node = node.getNext();
         }
 
@@ -34,7 +33,7 @@ public class Application {
             if (node.getValue()) {
                 System.out.println(i + " - vivo");
             } else {
-                System.out.println(1 + " - morto");
+                System.out.println(i + " - morto");
             }
 
             node = node.getNext();
