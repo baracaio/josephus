@@ -1,7 +1,7 @@
 package josephus;
 import ds.*;
 
-public class Game {
+public class Game implements GameInterface {
 
     private int numberOfPlayers;
     private int pace;
@@ -9,53 +9,16 @@ public class Game {
     public Game(int numberOfPlayers, int pace) {
         this.numberOfPlayers = numberOfPlayers;
         this.pace = pace;
+        LinkedListInterface list = new LinkedList();
     }
 
     public int getPace() {
         return pace;
     }
 
-    public void setPace(int pace) {
-        this.pace = pace;
-    }
-
     public int getNumberOfPlayers() {
         return numberOfPlayers;
     }
-
-    public void setNumberOfPlayers(int numberOfPlayers) {
-        this.numberOfPlayers = numberOfPlayers;
-    }
-
-    /**
-     *
-     * @param numberOfPlayers
-     * @param list
-     * @return
-     */
-    /*public void startGame() {
-        LinkedList list = new LinkedList();
-        if (generatePlayers(this.numberOfPlayers, list)) {
-
-            int survivors = list.getSize();
-            int counterToKill = 1;
-            NodeInterface current = list.getFirst();
-
-            do {
-                for (int i = 0; i < pace; i++) {
-                    current = current.getNext();
-                    if (current.getValue()) {
-                        counterToKill++;
-                    }
-                }
-                if (counterToKill == pace && current.getValue()) {
-                    current.setValue(false);
-                    survivors--;
-                }
-
-            } while (survivors != 1);
-        }
-    }*/
 
     /**
      *
