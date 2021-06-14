@@ -1,17 +1,21 @@
 package josephus;
-
 import ds.*;
 
 public class Game implements GameInterface {
 
-    private int numberOfPlayers;
-    private int pace;
-    LinkedListInterface list;
+    private final int numberOfPlayers;
+    private final int pace;
+    private final LinkedListInterface list;
+    private int survivors;
+    NodeInterface lastDead;
 
     public Game(int numberOfPlayers, int pace) {
         this.numberOfPlayers = numberOfPlayers;
         this.pace = pace;
-         list = new LinkedList();
+        list = new LinkedList();
+        generatePlayers(this.numberOfPlayers);
+        survivors = numberOfPlayers;
+        lastDead = list.getFirst();
     }
 
     public int getPace() {
@@ -23,67 +27,51 @@ public class Game implements GameInterface {
     }
 
     /**
-     * @return returns if the game has to continue or not
+     * @return Run a round of josephus algorithm and
+     * returns if the game has to continue or not
      */
     public boolean playTurn() {
-        int survivors = list.getSize();
+        if (this.survivors == 1) {
+            return false;
+        }
+        NodeInterface node = lastDead;
         int counterToKill = 1;
-
         boolean killedSomeone = false;
-        boolean gameHasToContinue = false;
 
-        NodeInterface current = list.getFirst();
-
-        while (!killedSomeone) {
-            for (int i = 0; i < this.pace; i++) {
-                current = current.getNext();
-                if (current.getValue()) {
-                    counterToKill++;
+        do {
+            if (counterToKill == pace) {
+                if (node.getValue()) {
+                    node.setValue(false);
+                    survivors--;
+                    killedSomeone = true;
+                    lastDead = node;
                 }
             }
-            if (counterToKill == pace && current.getValue()) {
-                current.setValue(false);
-                survivors--;
-                killedSomeone = true;
+            if (node.getValue()) {
+                counterToKill++;
             }
-        }
 
-        if (survivors > 1) {
-            gameHasToContinue = true;
-        }
+            node = node.getNext();
+        } while (!killedSomeone);
 
-        return gameHasToContinue;
+        return true;
     }
 
-    @Override
+    /**
+     * @return return the list
+     */
     public LinkedListInterface getList() {
         return this.list;
     }
 
     /**
      * @param numberOfPlayers number of players to be in the circle
-     * @param list            Linked list to be used
-     * @return Informs whether it generated the players or not
      */
-    private boolean generatePlayers(int numberOfPlayers, LinkedList list) {
-        if (isDataValid(numberOfPlayers, pace)) {
-            for (int i = 0; i < numberOfPlayers; i++) {
-                NodeInterface player = new Player();
-                list.insertEnd(player);
-            }
-            return true;
+    private void generatePlayers(int numberOfPlayers) {
+        for (int i = 0; i < numberOfPlayers; i++) {
+            NodeInterface player = new Player();
+            list.insertEnd(player);
         }
-        return false;
     }
-
-    /**
-     * @param numberOfPlayers number of players to be in the circle
-     * @param pace            key used to count the pace in the circle
-     * @return returns if user input is valid
-     */
-    private boolean isDataValid(int numberOfPlayers, int pace) {
-        return (numberOfPlayers > 1 && numberOfPlayers <= 50) && (pace > 1 && pace <= numberOfPlayers);
-    }
-
 
 }

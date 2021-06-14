@@ -1,42 +1,30 @@
-import ds.LinkedList;
-import ds.LinkedListInterface;
 import ds.NodeInterface;
-import ds.Player;
+import josephus.Game;
+import josephus.GameInterface;
 
 public class Application {
     public static void main(String[] args) {
-        LinkedListInterface circular = new LinkedList();
+
+        GameInterface game = new Game(12, 3);
         NodeInterface node;
-        for (int i = 0; i < 10; i++) {
-            circular.insertBeginning(new Player());
-        }
 
-        node = circular.getFirst();
+        int i = 1;
+        node = game.getList().getFirst();
+        int k;
 
-        for (int i = 0; i < 10; i++) {
-            if (node.getValue()) {
-                System.out.println(i + " - vivo");
-            } else {
-                System.out.println(i + " - morto");
-            }
-            node = node.getNext();
-        }
-
-        node = new Player();
-        node.setValue(false);
-
-        circular.insert(node, 4);
-
-        node = circular.getFirst();
-
-        for (int i = 0; i < 10; i++) {
-            if (node.getValue()) {
-                System.out.println(i + " - vivo");
-            } else {
-                System.out.println(i + " - morto");
-            }
-
-            node = node.getNext();
+        while (game.playTurn()) {
+            k = 1;
+            System.out.println("Round " + i);
+            do {
+                if (node.getValue()) {
+                    System.out.println(k + " - Alive");
+                } else {
+                    System.out.println(k + " - Dead");
+                }
+                k++;
+                node = node.getNext();
+            } while (node != game.getList().getFirst());
+            i++;
         }
     }
 }
