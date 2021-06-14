@@ -8,6 +8,12 @@ public class Player implements NodeInterface {
 
     private boolean value;
 
+    public Player() {
+        next = null;
+        previous = null;
+        value = true;
+    }
+
     @Override
     public NodeInterface getNext() {
         return next;
@@ -30,7 +36,7 @@ public class Player implements NodeInterface {
 
     @Override
     public boolean getValue() {
-        return false;
+        return value;
     }
 
     @Override
