@@ -1,6 +1,7 @@
 package gui;
 
 import ds.NodeInterface;
+import josephus.Game;
 import josephus.GameInterface;
 import ds.LinkedListInterface;
 
@@ -9,7 +10,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class JPaneGui extends Thread implements GuiInterface {
+public class JPaneGui extends JFrame implements GuiInterface {
+
+    private static int POINT_SIZE = 8;
 
     private int width;
 
@@ -21,62 +24,70 @@ public class JPaneGui extends Thread implements GuiInterface {
 
     private int total;
 
-    private JFrame frame;
 
     private JPanel menu;
-
-    private JPanel bottom;
-
-    private Circle circle;
 
     private LinkedListInterface list;
 
     private GameInterface game;
 
-    public JPaneGui(int width, int height) {
-        frame = new JFrame("Algorigmo de Josephus");
-        frame.setSize(width, height);
-        frame.setLayout(new FlowLayout());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        setMenu();
-        setBottom();
-
+    public JPaneGui(int width, int height, GameInterface game) {
         this.width = width;
         this.height = height;
+        this.game = game;
+        this.list = game.getList();
+        renderAnimation = true;
         interval = 2;
         total = 50;
 
-        renderAnimation = true;
+        this.setSize(width, height);
+        this.setLayout(new GridLayout());
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        setMenu();
+
+        this.setVisible(true);
     }
 
-    @Override
-    public void begin(GameInterface game) {
-        this.game = game;
-        list = game.getList();
-        circle = new Circle(200, 200, list.getSize(), 150);
-        circle.setNode(game.getList().getFirst());
-        frame.add(circle);
-        frame.setVisible(true);
+    @Override public void paint(Graphics g) {
+        super.paint(g);
+        drawCircle(g, 300, 300, 150, list.getSize());
     }
 
-    @Override
-    public void run() {
-        try {
-            NodeInterface node;
-            while (game.playTurn() && renderAnimation) {
-                node = game.getList().getFirst();
+    public void drawCircle(
+            Graphics g,
+            int px,
+            int py,
+            int r,
+            int total
+    ) {
+        int i = 1;
+        double distance = 2 * Math.PI / total;
+        NodeInterface node = list.getFirst();
 
-                do {
-                    circle.setNode(node);
+        do {
+            double cos = Math.cos(i * distance);
+            double sin = Math.sin(i * distance);
 
-                    node = node.getNext();
-                    sleep(1000);
-                } while (node != game.getList().getFirst());
+            int x = (int) ( cos * r + px );
+            int y = (int) ( sin * r + py );
+
+            if (node.getValue()) {
+                g.setColor(Color.GREEN);
+            } else {
+                g.setColor(Color.RED);
             }
-        } catch (InterruptedException exception) {
-            JOptionPane.showMessageDialog(frame, "Deu ruim, mano");
-        }
+
+            g.fillRect(x, y, POINT_SIZE, POINT_SIZE);
+
+            node = node.getNext();
+            i++;
+        } while (node != list.getFirst());
+    }
+
+    @Override
+    public void begin(GameInterface newGame) {
+
     }
 
     @Override
@@ -101,16 +112,6 @@ public class JPaneGui extends Thread implements GuiInterface {
         btnPace.setBounds(10, 60, 60, 40);
         btnPace.addActionListener(setPace());
 
-
-        menu.add("North", btnPace);
-        menu.add("North", btnTotalPlayers);
-
-        frame.add(menu);
-    }
-
-    private void setBottom() {
-        bottom = new JPanel();
-        bottom.setBounds(0, height - 100, width, 100);
         JButton start = new JButton("Iniciar simulação");
         start.setBounds(10, height - 60, 60, 40);
         start.addActionListener(render());
@@ -119,10 +120,30 @@ public class JPaneGui extends Thread implements GuiInterface {
         stop.setBounds(60, height - 60, 60, 40);
         stop.addActionListener(stopRendering());
 
-        bottom.add("South", start);
-        bottom.add("South", stop);
+        menu.add(btnPace);
+        menu.add(btnTotalPlayers);
+        menu.add(start);
+        menu.add(stop);
 
-        frame.add("South", bottom);
+        this.add(menu);
+    }
+
+    private void recreate() {
+        if (list == null || game == null) {
+            game = new Game(50, 2);
+            list = game.getList();
+
+            return;
+        }
+
+        game = new Game(getTotalPlayers(), getPace());
+        list = game.getList();
+    }
+
+    private void wipeList() {
+        while (list.getSize() > 0) {
+            list.removeBeginning();
+        }
     }
 
     private ActionListener setPace() {
@@ -137,11 +158,12 @@ public class JPaneGui extends Thread implements GuiInterface {
                     }
 
                     interval = pace;
+
                 } catch (NumberFormatException exception) {
-                    JOptionPane.showMessageDialog(frame, "O valor informado precisa ser um inteiro positivo.");
+                    JOptionPane.showMessageDialog(null, "O valor informado precisa ser um inteiro positivo.");
                 } catch (IllegalArgumentException exception) {
                     String message = "O valor informado precisa ser maior do que zero e menor do que o total de elementos. Atualmente, o total de elementos é igual a " + total;
-                    JOptionPane.showMessageDialog(frame, message);
+                    JOptionPane.showMessageDialog(null, message);
                 }
             }
         };
@@ -152,7 +174,7 @@ public class JPaneGui extends Thread implements GuiInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    int totalElementos = Integer.parseInt(JOptionPane.showInputDialog("Informe o total de elementos"));
+                    Integer totalElementos = Integer.parseInt(JOptionPane.showInputDialog("Informe o total de elementos"));
 
                     if (totalElementos < 1 || totalElementos > 50) {
                         throw new IllegalArgumentException("O valor informado não é válido. Informe um número entre 1 e 50.");
@@ -160,9 +182,9 @@ public class JPaneGui extends Thread implements GuiInterface {
 
                     total = totalElementos;
                 } catch (NumberFormatException exception) {
-                    JOptionPane.showMessageDialog(frame, "O valor informado precisa ser um inteiro positivo.");
+                    JOptionPane.showMessageDialog(null, "O valor informado precisa ser um inteiro positivo.");
                 } catch (IllegalArgumentException exception) {
-                    JOptionPane.showMessageDialog(frame, exception.getMessage());
+                    JOptionPane.showMessageDialog(null, exception.getMessage());
                 }
             }
         };
@@ -172,7 +194,15 @@ public class JPaneGui extends Thread implements GuiInterface {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                start();
+                try {
+                    recreate();
+                    Simulation simulation = new Simulation();
+                    renderAnimation = true;
+                    simulation.start();
+                } catch (IllegalThreadStateException exception) {
+                    JOptionPane.showMessageDialog(null,"Houve um erro inesperado");
+                    System.exit(1);
+                }
             }
         };
     }
@@ -182,7 +212,25 @@ public class JPaneGui extends Thread implements GuiInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
                 renderAnimation = false;
+                game = null;
+                wipeList();
+                list = null;
+                JOptionPane.showMessageDialog(null, "Jogo encerrado, jogue novamente ou feche o programa.");
             }
         };
+    }
+
+    private class Simulation extends Thread {
+        public void run() {
+            try {
+                while (game.playTurn() && renderAnimation) {
+                    repaint();
+                    sleep(300);
+                }
+            } catch (Exception exception) {
+                JOptionPane.showMessageDialog(null, "Houve um erro inesperado.");
+                System.exit(2);
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ public class Game implements GameInterface {
 
     private final int numberOfPlayers;
     private final int pace;
-    private LinkedListInterface list;
+    private final LinkedListInterface list;
     private int survivors;
     NodeInterface lastDead;
 
