@@ -40,6 +40,7 @@ public class JPaneGui extends JFrame implements GuiInterface {
         interval = 2;
         total = 50;
 
+        this.setTitle("Algoritmo de Josephus");
         this.setSize(width, height);
         this.setLayout(new GridLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -138,6 +139,8 @@ public class JPaneGui extends JFrame implements GuiInterface {
 
         game = new Game(getTotalPlayers(), getPace());
         list = game.getList();
+
+        repaint();
     }
 
     private void wipeList() {
@@ -158,7 +161,7 @@ public class JPaneGui extends JFrame implements GuiInterface {
                     }
 
                     interval = pace;
-
+                    recreate();
                 } catch (NumberFormatException exception) {
                     JOptionPane.showMessageDialog(null, "O valor informado precisa ser um inteiro positivo.");
                 } catch (IllegalArgumentException exception) {
@@ -181,6 +184,7 @@ public class JPaneGui extends JFrame implements GuiInterface {
                     }
 
                     total = totalElementos;
+                    recreate();
                 } catch (NumberFormatException exception) {
                     JOptionPane.showMessageDialog(null, "O valor informado precisa ser um inteiro positivo.");
                 } catch (IllegalArgumentException exception) {
