@@ -15,11 +15,13 @@ public class Circle extends JPanel {
     private int rad;
     private NodeInterface node;
 
-    public Circle(int x, int y, int max, int rad) {
+    public Circle(int x, int y, int max, int radian) {
         posX = x;
         posY = y;
-
+        rad = radian;
         total = max;
+
+        this.setBounds(0, 100, 400, 400);
     }
 
     public void setNode(NodeInterface node) {
@@ -29,10 +31,10 @@ public class Circle extends JPanel {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        draw(g, posX, posY, rad, total, node);
+        draw(g, posX, posY, rad, total);
     }
 
-    private void draw(Graphics graph, int posX, int posY, int rad, int total, NodeInterface node) {
+    private void draw(Graphics graph, int posX, int posY, int rad, int total) {
         int decayList = total;
 
         double playersSpacement = 2 * Math.PI / total;
