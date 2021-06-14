@@ -6,11 +6,12 @@ public class Game implements GameInterface {
 
     private int numberOfPlayers;
     private int pace;
+    LinkedListInterface list;
 
     public Game(int numberOfPlayers, int pace) {
         this.numberOfPlayers = numberOfPlayers;
         this.pace = pace;
-        LinkedListInterface list = new LinkedList();
+         list = new LinkedList();
     }
 
     public int getPace() {
@@ -54,12 +55,17 @@ public class Game implements GameInterface {
         return gameHasToContinue;
     }
 
+    @Override
+    public LinkedListInterface getList() {
+        return this.list;
+    }
+
     /**
      * @param numberOfPlayers number of players to be in the circle
      * @param list            Linked list to be used
      * @return Informs whether it generated the players or not
      */
-    public boolean generatePlayers(int numberOfPlayers, LinkedList list) {
+    private boolean generatePlayers(int numberOfPlayers, LinkedList list) {
         if (isDataValid(numberOfPlayers, pace)) {
             for (int i = 0; i < numberOfPlayers; i++) {
                 NodeInterface player = new Player();
@@ -75,7 +81,7 @@ public class Game implements GameInterface {
      * @param pace            key used to count the pace in the circle
      * @return returns if user input is valid
      */
-    public boolean isDataValid(int numberOfPlayers, int pace) {
+    private boolean isDataValid(int numberOfPlayers, int pace) {
         return (numberOfPlayers > 1 && numberOfPlayers <= 50) && (pace > 1 && pace <= numberOfPlayers);
     }
 
