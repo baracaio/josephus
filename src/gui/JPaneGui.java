@@ -1,6 +1,7 @@
 package gui;
 
-import Josephus.GameInterface;
+import ds.NodeInterface;
+import josephus.GameInterface;
 import ds.LinkedListInterface;
 
 import javax.swing.*;
@@ -26,11 +27,16 @@ public class JPaneGui extends Thread implements GuiInterface {
 
     private JPanel bottom;
 
+    private Circle circle;
+
     private LinkedListInterface list;
+
+    private GameInterface game;
 
     public JPaneGui(int width, int height) {
         frame = new JFrame("Algorigmo de Josephus");
         frame.setSize(width, height);
+        frame.setLayout(new FlowLayout());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         setMenu();
@@ -38,25 +44,38 @@ public class JPaneGui extends Thread implements GuiInterface {
 
         this.width = width;
         this.height = height;
-        interval = 0;
-        total = 0;
+        interval = 2;
+        total = 50;
 
         renderAnimation = true;
     }
 
     @Override
-    public void begin() {
+    public void begin(GameInterface game) {
+        this.game = game;
+        list = game.getList();
+        circle = new Circle(200, 200, list.getSize(), 150);
+        circle.setNode(game.getList().getFirst());
+        frame.add(circle);
         frame.setVisible(true);
     }
 
     @Override
     public void run() {
         try {
-            while (renderAnimation) {
-                // draw();
-            }
-        } catch (Exception exception) {
+            NodeInterface node;
+            while (game.playTurn() && renderAnimation) {
+                node = game.getList().getFirst();
 
+                do {
+                    circle.setNode(node);
+
+                    node = node.getNext();
+                    sleep(1000);
+                } while (node != game.getList().getFirst());
+            }
+        } catch (InterruptedException exception) {
+            JOptionPane.showMessageDialog(frame, "Deu ruim, mano");
         }
     }
 
@@ -80,11 +99,11 @@ public class JPaneGui extends Thread implements GuiInterface {
 
         JButton btnPace = new JButton("Definir intervalo");
         btnPace.setBounds(10, 60, 60, 40);
-        btnPace.addActionListener(this.setPace());
+        btnPace.addActionListener(setPace());
 
 
-        menu.add(btnPace);
-        menu.add(btnTotalPlayers);
+        menu.add("North", btnPace);
+        menu.add("North", btnTotalPlayers);
 
         frame.add(menu);
     }
@@ -92,7 +111,6 @@ public class JPaneGui extends Thread implements GuiInterface {
     private void setBottom() {
         bottom = new JPanel();
         bottom.setBounds(0, height - 100, width, 100);
-
         JButton start = new JButton("Iniciar simulação");
         start.setBounds(10, height - 60, 60, 40);
         start.addActionListener(render());
@@ -101,10 +119,10 @@ public class JPaneGui extends Thread implements GuiInterface {
         stop.setBounds(60, height - 60, 60, 40);
         stop.addActionListener(stopRendering());
 
-        bottom.add(start);
-        bottom.add(stop);
+        bottom.add("South", start);
+        bottom.add("South", stop);
 
-        frame.add(bottom);
+        frame.add("South", bottom);
     }
 
     private ActionListener setPace() {

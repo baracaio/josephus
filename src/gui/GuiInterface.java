@@ -1,9 +1,9 @@
 package gui;
 
-import Josephus.GameInterface;
+import josephus.GameInterface;
 
 public interface GuiInterface {
-    public void begin();
+    public void begin(GameInterface game);
 
     public int getPace();
 
